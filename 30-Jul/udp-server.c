@@ -10,7 +10,7 @@ int main(){
     char *ip = "192.168.56.112";
     port = 6000;
     struct sockaddr_in *addr;
-    server = socket_build(server, SOCK_DGRAM);
+    server = socket_build(server, SOCK_DGRAM, 0);
     
     addr = addr_fmt(ip, port);
     socketAdd(server);

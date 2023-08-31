@@ -9,6 +9,7 @@
 #include <time.h>
 #include <errno.h>
 #include <dirent.h>
+#include <sys/types.h>
 #include <signal.h>
 #include <sys/time.h>
 #include <sys/select.h>
@@ -16,6 +17,17 @@
 #include <execinfo.h>
 #include <assert.h>
 #include <poll.h>
+#include <netinet/in_systm.h>
+#include <netinet/ip.h>
+#include <netdb.h>
+#include <netinet/ip_icmp.h>
+#include <netinet/ip.h>
+#include <netinet/tcp.h>
+#include <netinet/udp.h>
+#include <math.h>
+#include <termios.h>
+
 #include "socket_mods.h"
 #include "udp_header.h"
+#include "socket_headers.h"
 extern int sigNum;

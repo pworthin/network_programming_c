@@ -64,8 +64,8 @@ int main(int argc, char **argv){
     int fd, server;
     signal(SIGINT, terminate);
     signal(SIGSEGV, stackTrace);
-    server = socket_build(fd);
-    struct sockaddr_in* server_addr = addr_fmt();
+    server = socket_build(fd, SOCK_STREAM, 0);
+    //struct sockaddr_in* server_addr = addr_fmt();
 
 
 }

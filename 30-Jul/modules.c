@@ -24,12 +24,12 @@ int socketAdd(int fd){
 
 }
 
-int socket_build(int fd, int type){
+int socket_build(int fd, int type, int protocol){
 
   
-    fd= socket(AF_INET, type, 0);
+    fd= socket(AF_INET, type, protocol);
     if(fd < 0){
-        perror("Error creating socket");
+        perror(RED "Error creating socket" RESET);
         stackTrace();
         //exit(EXIT_FAILURE);
     }
@@ -320,5 +320,26 @@ void stackTrace(){
 
     }
 
+    void gen_term(){
+        printf("\n\rTerminating program...\n");
+        fflush(stdout);
+        exit(0);
+    }
      
+
+void disable_echo_of_ctrl_c() {
+    struct termios oldt, newt;
+
+    // Get the current terminal settings
+    tcgetattr(STDIN_FILENO, &oldt);
+
+    // Make a new terminal setting based on the old one
+    newt = oldt;
+
+    // Disable the echo for Ctrl-C
+    newt.c_lflag &= ~(ECHOCTL);
+
+    // Set the new terminal setting
+    tcsetattr(STDIN_FILENO, TCSANOW, &newt);
+}
 
