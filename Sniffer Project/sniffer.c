@@ -48,7 +48,7 @@ void process_packet(int data, unsigned char *buffer){
         struct tcphdr *tcpheader = (struct tcphdr *)(buffer + iplen);
         printf("\nSource address: " GREEN "%s:%u" RESET "\t----\tDestination Address: "\
         GREEN "%s:%u " RESET " ",  inet_ntoa(source.sin_addr), ntohs(tcpheader->source),\
-        inet_ntoa(dest.sin_addr), (tcpheader->dest));
+        inet_ntoa(dest.sin_addr), ntohs(tcpheader->dest));
 
 
     }

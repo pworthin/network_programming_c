@@ -1,7 +1,20 @@
 #define _GNU_SOURCE
-#include "helper.h"
-#include "socket_mods.h"
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+#include <errno.h>
+#include <signal.h>
+#include <time.h>
+#include <dirent.h>
+
+#include <sys/types.h>
+#include <sys/socket.h>
+
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <unistd.h>
 
 
 
@@ -10,13 +23,13 @@
 int sigNum = 0;
 
 void terminate(int sigNum){
-
+    (void)sigNum;
     exit(0);
 }
 
-int socket_build(int fd){
+int socket_build(void){
 
-    fd = socket(AF_INET, SOCK_STREAM, 0);
+    int fd = socket(AF_INET, SOCK_STREAM, 0);
     if(fd < 0){
         perror("Error creating socket");
         exit(EXIT_FAILURE);
@@ -26,11 +39,11 @@ int socket_build(int fd){
     if (setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &reuse, sizeof(int)) == -1) {
         perror("Setsockopt error");
         close(fd);
-        return 1;
+        return -1;
     }
     return fd;
 }
-void directoryTrav(int cliSock, char *buffer){
+void directoryTrav(int cliSock, char *buffer, size_t buffer_size){
 
     struct dirent **directory;
     int n = scandir("/home/kali", &directory, NULL, alphasort);
@@ -41,7 +54,7 @@ void directoryTrav(int cliSock, char *buffer){
     }
 
     while(n--){
-        snprintf(buffer, sizeof(buffer),"%s\n", directory[n]->d_name);
+        snprintf(buffer, buffer_size,"%s\n", directory[n]->d_name);
         send(cliSock, buffer, strlen(buffer),0);
         send(cliSock, "\n", 1, 0);
         free(directory[n]);
@@ -50,27 +63,34 @@ void directoryTrav(int cliSock, char *buffer){
 }
 struct sockaddr_in* addr_fmt(){
 
-    struct sockaddr_in* addr = (struct sockaddr_in*)malloc(sizeof(struct sockaddr_in));
-    
+    struct sockaddr_in *addr =
+        malloc(sizeof(struct sockaddr_in));
+
+    if (addr == NULL) {
+        perror("malloc");
+        exit(EXIT_FAILURE);
+    }
+
+    memset(addr, 0, sizeof(*addr));
+
     addr->sin_family = AF_INET;
     addr->sin_port = htons(6000);
-    addr->sin_addr.s_addr = inet_addr("192.168.56.112");
+    addr->sin_addr.s_addr = htonl(INADDR_ANY);
 
     return addr;
 }
 
-void data_process(int client, int server, struct sockaddr_in* server_addr, char* ip){
-    
+void data_process(int client,  char* ip){
+    // Parameter struct sockaddr_in* server_addr was removed for the time being
     time_t now = time(NULL);
     
     struct tm *timeclock =localtime(&now);
     //struct sockaddr server_ip = server_addr;
-    char buffer[BUFFER_DEFAULT], send_buffer[BUFFER_DEFAULT], greeting[BUFFER_DEFAULT];
-    ssize_t bytes_recv, sentByte;
+    char send_buffer[BUFFER_DEFAULT], greeting[BUFFER_DEFAULT];
     snprintf(greeting, sizeof(send_buffer), "\nConnected with %s. It is now %02d:%02d:%02d", ip, timeclock->tm_hour, timeclock->tm_min, timeclock->tm_sec);
-    send(client, greeting, sizeof(greeting), 0);
+    send(client, greeting, strlen(greeting), 0);
     memset(send_buffer, 0, sizeof(send_buffer));
-    directoryTrav(client, send_buffer);
+    directoryTrav(client, send_buffer, sizeof(send_buffer));
     
 }
 
@@ -109,11 +129,11 @@ void session_build(int server, struct sockaddr_in* address){
         exit(EXIT_FAILURE);
     }
      printf("Connection established with %s:%d\n", inet_ntoa(client_addr.sin_addr), ntohs(client_addr.sin_port));
-     data_process(client, server, address, inet_ntoa(client_addr.sin_addr));
+     data_process(client, inet_ntoa(client_addr.sin_addr));
 
      close(client);
     printf("\rClosing socket....");
-    close(client);  
+
     }
     
 
@@ -130,13 +150,14 @@ void session_build(int server, struct sockaddr_in* address){
 
 int main(int argc, char **argv){
 
-    int fd, server, port;
+    int server;
+    //port;
     
     //const char* ip = argv[1];
     //port = atoi(argv[1]);
 
     signal(SIGINT, terminate);
-    server = socket_build(fd);
+    server = socket_build();
     struct sockaddr_in* server_addr = addr_fmt();
     session_build(server, server_addr);
 

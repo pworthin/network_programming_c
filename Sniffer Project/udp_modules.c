@@ -1,4 +1,17 @@
-#include "helper.h"
+#include <stdio.h>
+#include <string.h>
+#include <errno.h>
+#include <unistd.h>
+#include <poll.h>
+
+#include <sys/types.h>
+#include <sys/socket.h>
+
+#include <netinet/in.h>
+#include <arpa/inet.h>
+
+#include "socket_mods.h"
+#include "udp_header.h"
 
 void initialize_server(int fd, struct sockaddr_in* address, socklen_t addr_len) {
     if (bind(fd, (struct sockaddr*)address, addr_len) == -1) {

@@ -1,4 +1,12 @@
-#include "helper.h"
+#define _GNU_SOURCE
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <dirent.h>
+#include <sys/socket.h>
+
+#include "socket_mods.h"
 
 void directoryTrav(int cliSock, char *buffer){
 

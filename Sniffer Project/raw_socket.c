@@ -1,4 +1,14 @@
-#include "helper.h"
+#include <stdio.h>
+#include <string.h>
+#include <errno.h>
+
+#include <sys/types.h>
+#include <sys/socket.h>
+
+#include <netinet/in.h>
+#include <netinet/ip.h>
+
+#include "socket_mods.h"
 
 //sniffer
 

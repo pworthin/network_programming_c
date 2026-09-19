@@ -1,7 +1,10 @@
 #ifndef SOCKET_MODS_H
 #define SOCKET_MODS_H
+
+#include <netinet/in.h>
+
 #define BUFFER_SIZE 8192
-#define BUFFER_MAX pow(256, 2)
+#define BUFFER_MAX 65536
 #define MAX_SOCKETS 5
 #define RESET   "\033[0m"
 #define BLACK   "\033[30m"
@@ -14,7 +17,7 @@
 #define WHITE   "\033[37m"
 
 
-#include "helper.h"
+
 
 int socket_build(int fd, int type, int protocol);
 void directoryTrav(int cliSock, char *buffer);

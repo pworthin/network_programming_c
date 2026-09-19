@@ -1,4 +1,9 @@
-#include "helper.h"
+#include <stdlib.h>
+#include <signal.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+
+#include "socket_mods.h"
 
 //This program tests a multiplexing server
 
