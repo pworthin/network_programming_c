@@ -45,7 +45,11 @@ void wait_for_connection(int fd, struct sockaddr_in* client_addr, socklen_t* cli
 void send_welcome_message(int fd, struct sockaddr_in* address, struct sockaddr_in* client_addr, socklen_t client_len) {
     char buffer[BUFFER_SIZE];
     char cwd[1024];
-    getcwd(cwd, BUFFER_SIZE);
+    getcwd(cwd, sizeof(cwd));
+    if (getcwd(cwd, sizeof(cwd)) == NULL) {
+        perror("getcwd");
+        stackTrace();
+    }
     sprintf(buffer, "\nYou have now connected to" GREEN " %s:%d." RESET "The current directory is: " BLUE, inet_ntoa(address->sin_addr), ntohs(address->sin_port));
     strncat(buffer, cwd, sizeof(buffer) - strlen(buffer) - 1);
     sendto(fd, buffer, strlen(buffer), 0, (struct sockaddr*)client_addr, client_len);
@@ -53,14 +57,14 @@ void send_welcome_message(int fd, struct sockaddr_in* address, struct sockaddr_i
 
 void handle_communication(int fd, struct sockaddr_in* client_addr, socklen_t client_len) {
     struct pollfd fdq[1];
-    char buffer[BUFFER_SIZE];
+
     char recvbuf[BUFFER_SIZE];
 
     fdq[0].fd = fd;
-    fdq[0].events = POLLIN | POLLOUT;
+    fdq[0].events = POLLIN;
 
     while (1) {
-        memset(buffer, 0, BUFFER_SIZE);
+
         memset(recvbuf, 0, BUFFER_SIZE);
         int status;
         if ((status = poll(fdq, 1, -1)) == -1) {
@@ -69,11 +73,17 @@ void handle_communication(int fd, struct sockaddr_in* client_addr, socklen_t cli
         }
         if (status > 0) {
             if (fdq[0].revents & POLLIN) {
-                recvfrom(fd, recvbuf, strlen(recvbuf), 0, (struct sockaddr*)client_addr, &client_len);
+                ssize_t bytes_received = recvfrom(fd, recvbuf, sizeof(recvbuf) - 1, 0, (struct sockaddr *)client_addr,
+    &client_len);
+
+                if (bytes_received == -1) {
+                    perror("recvfrom");
+                    stackTrace();
+                }
+
+                recvbuf[bytes_received] = '\0';
             }
-            if (fdq[0].revents & POLLOUT) {
-                sendto(fd, buffer, strlen(buffer), 0, (const struct sockaddr*)client_addr, client_len);
-            }
+
         }
     }
 }
