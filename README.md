@@ -23,7 +23,7 @@ The project includes examples of:
 
 ## Linux Networking Project
 
-The `Sniffer Project` directory contains the primary networking experiments.
+The `Linux Networking Project` directory contains the primary networking experiments.
 
 ### TCP Server
 
