@@ -4,6 +4,8 @@ A collection of network programming exercises and experiments written in C, focu
 
 This repository was originally developed as a hands-on exploration of Linux network programming and has since been cleaned up for reference and demonstration.
 
+Binary files will be stored in the /bin folder created by the Makefile.
+
 ## Topics Demonstrated
 
 The project includes examples of:
