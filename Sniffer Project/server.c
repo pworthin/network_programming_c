@@ -14,19 +14,20 @@
 
 #include <netinet/in.h>
 #include <arpa/inet.h>
-#include <unistd.h>
-
-
+//#include <termios.h>
+#include "terminator.h"
 
 #define BUFFER_DEFAULT 4096
 
-int sigNum = 0;
+//volatile sig_atomic_t shutdown_requested = 0;
 
+/*
 void terminate(int sigNum){
     (void)sigNum;
-    exit(0);
+    shutdown_requested = 1;
+    //exit(0);
 }
-
+*/
 int socket_build(void){
 
     int fd = socket(AF_INET, SOCK_STREAM, 0);
@@ -87,7 +88,7 @@ void data_process(int client,  char* ip){
     struct tm *timeclock =localtime(&now);
     //struct sockaddr server_ip = server_addr;
     char send_buffer[BUFFER_DEFAULT], greeting[BUFFER_DEFAULT];
-    snprintf(greeting, sizeof(send_buffer), "\nConnected with %s. It is now %02d:%02d:%02d", ip, timeclock->tm_hour, timeclock->tm_min, timeclock->tm_sec);
+    snprintf(greeting, sizeof(greeting), "\nConnected with %s. It is now %02d:%02d:%02d", ip, timeclock->tm_hour, timeclock->tm_min, timeclock->tm_sec);
     send(client, greeting, strlen(greeting), 0);
     memset(send_buffer, 0, sizeof(send_buffer));
     directoryTrav(client, send_buffer, sizeof(send_buffer));
@@ -125,8 +126,11 @@ void session_build(int server, struct sockaddr_in* address){
        
 
     if (client == -1){
+        if (errno == EINTR && shutdown_requested)
+            break;
         perror("Client connection error");
-        exit(EXIT_FAILURE);
+        //exit(EXIT_FAILURE);
+        break;
     }
      printf("Connection established with %s:%d\n", inet_ntoa(client_addr.sin_addr), ntohs(client_addr.sin_port));
      data_process(client, inet_ntoa(client_addr.sin_addr));
@@ -135,31 +139,49 @@ void session_build(int server, struct sockaddr_in* address){
     printf("\rClosing socket....");
 
     }
-    
+    close(server);
+    free(address);
 
-       
-    
+    printf("\nServer terminated.\n");
+
     
     exit(0);
 }
 
 
 
-
-
-
-int main(int argc, char **argv){
+int main(void){
 
     int server;
-    //port;
-    
-    //const char* ip = argv[1];
-    //port = atoi(argv[1]);
 
-    signal(SIGINT, terminate);
+
+
+    // *** Backup code...DO NOT DELETE!*** //
+    //signal(SIGINT, terminate);
+    /*
+    struct sigaction sa = {0};
+
+    sa.sa_handler = terminate;
+    sigemptyset(&sa.sa_mask);
+    sa.sa_flags = 0;               // importantly: no SA_RESTART
+
+    sigaction(SIGINT, &sa, NULL);
+
+    if (tcgetattr(STDIN_FILENO, &old_term) == 0) {
+        new_term = old_term;
+        new_term.c_lflag &= ~ECHOCTL;
+        tcsetattr(STDIN_FILENO, TCSANOW, &new_term);
+    }
+
+  */
+    //******************************** //
+
+    sentinel();
+
     server = socket_build();
     struct sockaddr_in* server_addr = addr_fmt();
     session_build(server, server_addr);
+    terminal_guard();
 
     return 0;
 
