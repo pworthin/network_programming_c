@@ -145,7 +145,7 @@ void session_build(int server, struct sockaddr_in* address){
     printf("\nServer terminated.\n");
 
     
-    exit(0);
+    //exit(0);
 }
 
 

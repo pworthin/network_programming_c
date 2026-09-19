@@ -18,7 +18,7 @@ void sentinel(void) {
 
     sigaction(SIGINT, &sa, NULL);
     io_config();
-    terminal_guard();
+
 
 }
 
@@ -26,10 +26,10 @@ void sentinel(void) {
 void io_config(void){
 
 
-    struct termios old_term, new_term;
+    struct termios new_term;
     temp = old_term;
     if (tcgetattr(STDIN_FILENO, &old_term) == 0) {
-        new_term = old_term;
+        new_term = temp;
         new_term.c_lflag &= ~ECHOCTL;
         tcsetattr(STDIN_FILENO, TCSANOW, &new_term);
     }
