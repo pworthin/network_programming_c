@@ -52,3 +52,5 @@ vgcore.*
 .DS_Store
 Thumbs.db
 desktop.ini
+cleanup_repo.bat
+
