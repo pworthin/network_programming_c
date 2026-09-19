@@ -25,7 +25,7 @@ int position = 0;
 
 int socketAdd(int fd){
     
-    if(position > MAX_SOCKETS){
+    if(position >= MAX_SOCKETS){
 
         printf("\nSocket #%d: Maximum connections exceeded!", fd);
         fflush(stdout);
@@ -41,10 +41,10 @@ int socketAdd(int fd){
 
 }
 
-int socket_build(int fd, int type, int protocol){
+int socket_build(int type, int protocol){
 
   
-    fd= socket(AF_INET, type, protocol);
+    int fd= socket(AF_INET, type, protocol);
     if(fd < 0){
         perror(RED "Error creating socket" RESET);
         stackTrace();
@@ -64,25 +64,47 @@ int socket_build(int fd, int type, int protocol){
 
 
 
-struct sockaddr_in* addr_fmt(char* ip, int port){
+struct sockaddr_in *addr_fmt(char *ip, int port)
+{
+    struct sockaddr_in *addr = malloc(sizeof(*addr));
 
-    struct sockaddr_in* addr = (struct sockaddr_in*)malloc(sizeof(struct sockaddr_in));
-    int result;
+    if (addr == NULL) {
+        perror("malloc");
+        exit(EXIT_FAILURE);
+    }
+
+    memset(addr, 0, sizeof(*addr));
+
     addr->sin_family = AF_INET;
     addr->sin_port = htons(port);
-    //addr->sin_addr.s_addr = inet_addr("192.168.56.112");
-    result = inet_pton(AF_INET, ip, &addr->sin_addr);
-    if(result == -1)
-    {
-        fprintf(stderr, "\nInvalid IP address format");
-        stackTrace();
+
+    if (strcmp(ip, "any") == 0) {
+        addr->sin_addr.s_addr = htonl(INADDR_ANY);
     }
+    else {
+        int result = inet_pton(AF_INET, ip, &addr->sin_addr);
+
+        if (result == 0) {
+            fprintf(stderr, "Invalid IPv4 address: %s\n", ip);
+            free(addr);
+            exit(EXIT_FAILURE);
+        }
+
+        if (result == -1) {
+            perror("inet_pton");
+            free(addr);
+            exit(EXIT_FAILURE);
+        }
+    }
+
     return addr;
 }
 
-void terminate(int signNum){
+void terminate(int sigNum){
 
+    (void) sigNum;
     printf("\rTerminating server upon request");
+    printf("\n");
     fflush(stdout);
 
     for(int i = 0; i < position; i++){
@@ -313,7 +335,7 @@ void data_process(int client, int server, struct sockaddr_in* server_addr, char*
      char send_buffer[BUFFER_SIZE], greeting[BUFFER_SIZE];
     //ssize_t bytes_recv, sentByte;
     snprintf(greeting, sizeof(send_buffer), "\nConnected with %s. It is now %02d:%02d:%02d", ip, timeclock->tm_hour, timeclock->tm_min, timeclock->tm_sec);
-    send(client, greeting, sizeof(greeting), 0);
+    send(client, greeting, strlen(greeting), 0);
     memset(send_buffer, 0, sizeof(send_buffer));
     directoryTrav(client, send_buffer);
     
@@ -340,6 +362,7 @@ void stackTrace(){
     void gen_term(){
         printf("\n\rTerminating program...\n");
         fflush(stdout);
+        printf("\n");
         exit(0);
     }
      

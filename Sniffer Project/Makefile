@@ -6,7 +6,7 @@ CFLAGS = -Wall -g
 
 # Source files
 #SRC_FILES = fileio.c helper.h modules.c socket_mods.h test-server-0818.c
-SRC_FILES = fileio.c modules.c udp-server.c udp_modules.c terminator.c
+SRC_FILES = fileio.c modules.c udp-server.c udp_modules.c terminator.c server.c
 
 # Object files
 OBJ_FILES = $(SRC_FILES:.c=.o)

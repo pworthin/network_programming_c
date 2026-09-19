@@ -5,6 +5,8 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 void initialize_server(int fd, struct sockaddr_in* address, socklen_t addr_len);
 void wait_for_connection(int fd, struct sockaddr_in* client_addr, socklen_t* client_len, char* client_ip, int* client_port);

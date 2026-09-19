@@ -19,7 +19,7 @@
 
 
 
-int socket_build(int fd, int type, int protocol);
+int socket_build(int type, int protocol);
 void directoryTrav(int cliSock, char *buffer);
 struct sockaddr_in* addr_fmt(char* ip, int port);
 void terminate(int sigNum);

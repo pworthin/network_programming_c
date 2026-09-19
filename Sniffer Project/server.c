@@ -14,20 +14,12 @@
 
 #include <netinet/in.h>
 #include <arpa/inet.h>
-//#include <termios.h>
+
 #include "terminator.h"
 
 #define BUFFER_DEFAULT 4096
 
-//volatile sig_atomic_t shutdown_requested = 0;
 
-/*
-void terminate(int sigNum){
-    (void)sigNum;
-    shutdown_requested = 1;
-    //exit(0);
-}
-*/
 int socket_build(void){
 
     int fd = socket(AF_INET, SOCK_STREAM, 0);
@@ -155,33 +147,12 @@ int main(void){
     int server;
 
 
-
-    // *** Backup code...DO NOT DELETE!*** //
-    //signal(SIGINT, terminate);
-    /*
-    struct sigaction sa = {0};
-
-    sa.sa_handler = terminate;
-    sigemptyset(&sa.sa_mask);
-    sa.sa_flags = 0;               // importantly: no SA_RESTART
-
-    sigaction(SIGINT, &sa, NULL);
-
-    if (tcgetattr(STDIN_FILENO, &old_term) == 0) {
-        new_term = old_term;
-        new_term.c_lflag &= ~ECHOCTL;
-        tcsetattr(STDIN_FILENO, TCSANOW, &new_term);
-    }
-
-  */
-    //******************************** //
-
     sentinel();
 
     server = socket_build();
     struct sockaddr_in* server_addr = addr_fmt();
     session_build(server, server_addr);
-    terminal_guard();
+    tstate_return();
 
     return 0;
 
