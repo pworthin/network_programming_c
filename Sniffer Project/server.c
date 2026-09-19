@@ -39,7 +39,7 @@ int socket_build(void){
 void directoryTrav(int cliSock, char *buffer, size_t buffer_size){
 
     struct dirent **directory;
-    int n = scandir("/home/kali", &directory, NULL, alphasort);
+    int n = scandir("/home/", &directory, NULL, alphasort);
     if(n < 0){
 
         perror("Scandir");
