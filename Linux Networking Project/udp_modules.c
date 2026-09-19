@@ -46,7 +46,7 @@ void send_welcome_message(int fd, struct sockaddr_in* address, struct sockaddr_i
     char buffer[BUFFER_SIZE];
     char *msg = "\nYou have now connected to" GREEN " %s:%d." RESET "The current directory is: " BLUE;
     char cwd[1024];
-    
+
     if (getcwd(cwd, sizeof(cwd)) == NULL) {
         perror("getcwd");
         stackTrace();

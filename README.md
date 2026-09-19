@@ -21,7 +21,7 @@ The project includes examples of:
 - Filesystem interaction through a network connection
 - Dynamic memory and buffer management in C
 
-## Sniffer Project
+## Linux Networking Project
 
 The `Sniffer Project` directory contains the primary networking experiments.
 
