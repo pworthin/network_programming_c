@@ -25,7 +25,7 @@ struct sockaddr_in* addr_fmt(char* ip, int port);
 void terminate(int sigNum);
 void session_build(int server, struct sockaddr_in* address);
 void stackTrace();
-void data_process(int client, int server, struct sockaddr_in* server_addr, char* ip);
+void data_process(int client, char* ip);
 void multiplex_session(int fd, struct sockaddr_in* address);
 int socketAdd(int fd);
 void udp_session(int fd, struct sockaddr_in* address);

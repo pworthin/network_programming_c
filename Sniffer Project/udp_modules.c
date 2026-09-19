@@ -44,14 +44,15 @@ void wait_for_connection(int fd, struct sockaddr_in* client_addr, socklen_t* cli
 
 void send_welcome_message(int fd, struct sockaddr_in* address, struct sockaddr_in* client_addr, socklen_t client_len) {
     char buffer[BUFFER_SIZE];
+    char *msg = "\nYou have now connected to" GREEN " %s:%d." RESET "The current directory is: " BLUE;
     char cwd[1024];
     getcwd(cwd, sizeof(cwd));
     if (getcwd(cwd, sizeof(cwd)) == NULL) {
         perror("getcwd");
         stackTrace();
     }
-    sprintf(buffer, "\nYou have now connected to" GREEN " %s:%d." RESET "The current directory is: " BLUE, inet_ntoa(address->sin_addr), ntohs(address->sin_port));
-    strncat(buffer, cwd, sizeof(buffer) - strlen(buffer) - 1);
+    snprintf(buffer, sizeof(buffer), msg, inet_ntoa(address->sin_addr), ntohs(address->sin_port),cwd);
+    //strncat(buffer, cwd, sizeof(buffer) - strlen(buffer) - 1);
     sendto(fd, buffer, strlen(buffer), 0, (struct sockaddr*)client_addr, client_len);
 }
 

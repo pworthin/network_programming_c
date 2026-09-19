@@ -317,7 +317,7 @@ void multiplex_session(int fd, struct sockaddr_in* address){
             printf("\nConnection established with %s:%d\n", inet_ntoa(client_addr.sin_addr),\
         ntohs(client_addr.sin_port));
             
-            data_process(clientSocket, fd, address, inet_ntoa(address->sin_addr));
+            data_process(clientSocket, inet_ntoa(address->sin_addr));
             sleep(5);
         }
             
@@ -326,7 +326,7 @@ void multiplex_session(int fd, struct sockaddr_in* address){
 }
 
 
-void data_process(int client, int server, struct sockaddr_in* server_addr, char* ip){
+void data_process(int client, char* ip){
     
     time_t now = time(NULL);
     
